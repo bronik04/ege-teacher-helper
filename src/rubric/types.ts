@@ -26,3 +26,31 @@ export interface RubricTask {
   criteria: RubricCriterion[];
   source: { url: string; pages: number[] };
 }
+
+export interface AssessmentDraft {
+  taskId: TaskId;
+  rubricYear: 2026;
+  noAnswer: boolean;
+  aspects: AspectMark[];
+  questionAccepted?: (boolean | null)[];
+  characterCount?: number | null;
+  phraseCount?: number | null;
+  assessedFragmentConfirmed?: boolean | null;
+  plagiarismOver30?: boolean | null;
+  organizationErrors?: number | null;
+  lexicalGrammarErrors?: number | null;
+  hanziErrors?: number | null;
+  punctuationErrors?: number | null;
+  phoneticErrors?: number | null;
+  grossLexicalGrammarErrors?: number | null;
+  grossPhoneticErrors?: number | null;
+  expertLevels?: Partial<Record<'content' | 'organization' | 'language' | 'script', number>>;
+}
+
+export interface ScoreResult {
+  criteria: Partial<Record<CriterionKey, number | null>>;
+  provisionalTotal: number;
+  finalTotal: number | null;
+  missing: string[];
+  reasons: string[];
+}
