@@ -35,6 +35,10 @@ export interface AssessmentDraft {
   questionAccepted?: (boolean | null)[];
   characterCount?: number | null;
   phraseCount?: number | null;
+  hasIntroduction?: boolean | null;
+  hasConclusion?: boolean | null;
+  isLogical?: boolean | null;
+  linksAdequate?: boolean | null;
   assessedFragmentConfirmed?: boolean | null;
   plagiarismOver30?: boolean | null;
   organizationErrors?: number | null;
