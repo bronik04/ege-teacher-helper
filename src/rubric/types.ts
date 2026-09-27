@@ -58,3 +58,12 @@ export interface ScoreResult {
   missing: string[];
   reasons: string[];
 }
+
+export interface AssessmentRecord {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  label: string;
+  note: string;
+  draft: AssessmentDraft;
+}
