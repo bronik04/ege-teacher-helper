@@ -13,6 +13,8 @@ import { deleteRecord, loadRecords, saveRecord, writeRecords } from './storage/r
 import { exportRecords, importRecords } from './storage/transfer';
 import { clearWorkingDraft, loadWorkingDraft, saveWorkingDraft } from './storage/working-draft';
 import type { WorkingDraft } from './storage/working-draft';
+import { filterRecords } from './storage/filter-records';
+import type { RecordFilters } from './storage/filter-records';
 import './styles.css';
 
 const AUTOSAVE_ERROR = 'Не удалось автосохранить черновик. Введённые отметки остались на экране.';
@@ -60,8 +62,10 @@ export default function App() {
   const [dirty, setDirty] = useState(initial.working !== null);
   const [notice, setNotice] = useState(initial.working ? 'Восстановлен автосохранённый черновик.' : '');
   const [importing, setImporting] = useState(false);
+  const [recordFilters, setRecordFilters] = useState<RecordFilters>({ query: '', taskId: 'all', status: 'all' });
   const task = FIPI_2026[draft.taskId];
   const result = calculateAssessment(draft);
+  const visibleRecords = filterRecords(records, recordFilters);
   const reportRecord = records.find((item) => item.id === reportRecordId);
   function openReference() { setReferenceTaskId(draft.taskId); setView('reference'); }
 
@@ -166,7 +170,23 @@ export default function App() {
         <div className="transfer-bar"><button type="button" onClick={() => setView('check')}>Вернуться к проверке</button>
           <div><button type="button" onClick={downloadExport}>Скачать JSON</button>
             <label className="import-label">Импорт JSON<input type="file" accept=".json,application/json" disabled={importing} onChange={uploadImport} /></label></div></div>
-        <RecordList records={records} onOpen={openRecord} onPrint={(record) => { setReportRecordId(record.id); setView('report'); }} onDelete={remove} /></section>
+        <div className="record-filters" role="search" aria-label="Поиск сохранённых работ">
+          <label className="field"><span>Поиск по метке</span><input type="search" value={recordFilters.query} placeholder="Метка ученика"
+            onChange={(event) => setRecordFilters((current) => ({ ...current, query: event.target.value }))} /></label>
+          <label className="field"><span>Фильтр по заданию</span><select value={recordFilters.taskId}
+            onChange={(event) => setRecordFilters((current) => ({ ...current, taskId: event.target.value as RecordFilters['taskId'] }))}>
+            <option value="all">Все задания</option>{Object.values(FIPI_2026).map((item) => <option key={item.id} value={item.id}>{item.shortTitle}</option>)}
+          </select></label>
+          <label className="field"><span>Фильтр по статусу</span><select value={recordFilters.status}
+            onChange={(event) => setRecordFilters((current) => ({ ...current, status: event.target.value as RecordFilters['status'] }))}>
+            <option value="all">Все статусы</option><option value="complete">Готово</option><option value="draft">Черновик</option>
+          </select></label>
+          <div className="filter-summary"><span role="status">Найдено {visibleRecords.length} из {records.length}</span>
+            <button type="button" onClick={() => setRecordFilters({ query: '', taskId: 'all', status: 'all' })}>Сбросить фильтры</button></div>
+        </div>
+        {records.length > 0 && visibleRecords.length === 0
+          ? <div className="empty-state"><h2>Ничего не найдено</h2><p>Измените запрос или сбросьте фильтры.</p></div>
+          : <RecordList records={visibleRecords} onOpen={openRecord} onPrint={(record) => { setReportRecordId(record.id); setView('report'); }} onDelete={remove} />}</section>
         : <>
           <div className="task-bar"><label htmlFor="task-select">Задание</label>
             <select id="task-select" value={draft.taskId} onChange={(event) => switchTask(event.target.value as TaskId)}>

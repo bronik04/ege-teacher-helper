@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import App from './App';
-import { loadRecords } from './storage/records';
+import { loadRecords, saveRecord } from './storage/records';
 import { WORKING_DRAFT_KEY } from './storage/working-draft';
 
 beforeEach(() => {
@@ -23,6 +23,39 @@ function acceptFiveQuestions() {
 }
 
 describe('teacher checking flow', () => {
+  it('searches and filters saved work by task and completion status', () => {
+    const timestamp = '2026-09-27T10:00:00.000Z';
+    saveRecord(window.localStorage, { id: 'a', createdAt: timestamp, updatedAt: timestamp,
+      label: 'Аня', note: '', draft: { taskId: 'speaking1', rubricYear: 2026, noAnswer: false,
+        aspects: [], questionAccepted: [true, true, true, true, true] } });
+    saveRecord(window.localStorage, { id: 'b', createdAt: timestamp, updatedAt: timestamp,
+      label: 'Анна', note: '', draft: { taskId: 'speaking1', rubricYear: 2026, noAnswer: false,
+        aspects: [], questionAccepted: [true, null, null, null, null] } });
+    saveRecord(window.localStorage, { id: 'c', createdAt: timestamp, updatedAt: timestamp,
+      label: 'Борис', note: '', draft: { taskId: 'writing28', rubricYear: 2026, noAnswer: true,
+        aspects: [null, null, null, null, null, null] } });
+    const saved = window.localStorage.getItem('ege-assessments-v1');
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранённые работы' }));
+    expect(screen.getByText('Найдено 3 из 3')).toBeInTheDocument();
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Поиск по метке' }), { target: { value: 'АН' } });
+    expect(screen.getByText('Найдено 2 из 3')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Борис' })).not.toBeInTheDocument();
+    fireEvent.change(screen.getByRole('combobox', { name: 'Фильтр по заданию' }), { target: { value: 'speaking1' } });
+    fireEvent.change(screen.getByRole('combobox', { name: 'Фильтр по статусу' }), { target: { value: 'draft' } });
+    expect(screen.getByRole('heading', { name: 'Анна' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Аня' })).not.toBeInTheDocument();
+    fireEvent.change(screen.getByRole('combobox', { name: 'Фильтр по статусу' }), { target: { value: 'complete' } });
+    expect(screen.getByText('Найдено 1 из 3')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Аня' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Анна' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Сбросить фильтры' }));
+    expect(screen.getByText('Найдено 3 из 3')).toBeInTheDocument();
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Поиск по метке' }), { target: { value: 'неизвестный' } });
+    expect(screen.getByRole('heading', { name: 'Ничего не найдено' })).toBeInTheDocument();
+    expect(window.localStorage.getItem('ege-assessments-v1')).toBe(saved);
+  });
+
   it('opens a printable report for one saved work without changing its data', () => {
     render(<App />);
     chooseTask('speaking1');
