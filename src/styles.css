@@ -84,6 +84,34 @@ main { max-width: 1430px; margin: auto; padding: 32px 4vw 72px; }
 .criterion-list li { margin-bottom: 5px; }
 .source-link { display: flex; justify-content: space-between; margin-top: 18px; padding: 12px 14px; border-radius: 10px; background: #f0f5ee; color: #35614c; font-size: 12px; font-weight: 800; text-decoration: none; }
 .source-meta { margin-bottom: 0; color: #9baa9b; font-size: 10px; }
+.reference-inline { margin-top: 14px; padding: 0; border: 0; background: none; color: #a95241; font-size: 12px; font-weight: 800; text-align: left; }
+.reference-view .view-heading { margin-top: 8px; }
+.reference-back { padding: 10px 14px; border: 1px solid #d5e2d3; border-radius: 10px; background: #fff; color: #37624a; font-size: 12px; font-weight: 800; }
+.reference-intro { margin-bottom: 22px; background: #fdfaf4; }
+.reference-intro h3, .reference-criteria h3, .reference-examples h3 { margin: 6px 0 12px; font-size: 20px; letter-spacing: -.04em; }
+.reference-intro p { max-width: 1000px; margin: 8px 0 0; color: #5e7463; font-size: 13px; line-height: 1.7; }
+.reference-task { margin-bottom: 22px; }
+.reference-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(290px, .7fr); align-items: start; gap: 22px; }
+.reference-rule { margin: 0 0 20px; padding: 14px 16px; border-left: 3px solid #b85e4a; border-radius: 0 8px 8px 0; background: #fbf4ee; color: #654d3f; font-size: 13px; line-height: 1.65; }
+.table-scroll { overflow-x: auto; }
+.reference-criteria table { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1.55; }
+.reference-criteria th, .reference-criteria td { padding: 15px 12px; border-bottom: 1px solid #e6eee4; text-align: left; vertical-align: top; }
+.reference-criteria thead th { color: #718675; background: #f2f6f0; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; }
+.reference-criteria tbody th { min-width: 175px; font-weight: 700; }
+.reference-criteria td { min-width: 170px; color: #536d5a; }
+.reference-criteria td strong, .reference-criteria td small { display: block; }
+.reference-criteria td small { margin-top: 5px; color: #6b7d6d; font-size: 11px; }
+.criterion-code { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; margin-right: 9px; padding: 3px 5px; border-radius: 6px; background: #f6e9e3; color: #ac5644; font-size: 11px; }
+.reference-examples { padding: 7px 0; }
+.example-list { display: grid; gap: 12px; }
+.example-card { padding: 20px; }
+.example-card h4 { margin: 10px 0 7px; font-size: 15px; }
+.example-card p { margin: 0 0 12px; color: #65796a; font-size: 12px; line-height: 1.65; }
+.example-card > strong { display: block; color: #294c39; font-size: 12px; line-height: 1.6; }
+.example-card a { display: inline-block; margin-top: 13px; color: #a95241; font-size: 11px; font-weight: 800; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.example-kind { display: inline-block; padding: 5px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; }
+.example-kind.official { background: #e9f2ea; color: #3b7350; }
+.example-kind.educational { background: #f8eee2; color: #9b6537; }
 .view-heading { display: flex; align-items: end; justify-content: space-between; margin: 28px 0 20px; }
 .transfer-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
 .transfer-bar > div { display: flex; gap: 10px; }
@@ -107,5 +135,7 @@ main { max-width: 1430px; margin: auto; padding: 32px 4vw 72px; }
 footer { padding: 25px 4vw; border-top: 1px solid #e2e9e0; color: #94a296; font-size: 11px; text-align: center; }
 @media (max-width: 1050px) { .workspace-grid { grid-template-columns: minmax(0, 1fr) 300px; } .hero-figure { margin-right: 0; } .hero-figure span { width: 50px; height: 50px; } }
 @media (max-width: 760px) { main { padding: 20px 16px 50px; } .site-header { height: 68px; padding: 0 16px; } .hero { padding: 28px 24px; } .hero-figure { display: none; } .workspace-grid { grid-template-columns: 1fr; } .sidebar { position: static; grid-row: 1; } .task-bar { flex-wrap: wrap; } .task-bar select { flex: 1; min-width: 200px; } .task-meta { width: 100%; } .card, .score-panel { padding: 20px; } .record-card { flex-direction: column; } .record-actions { flex-wrap: wrap; } }
+@media (max-width: 900px) { .reference-layout { grid-template-columns: 1fr; } .reference-examples { padding: 0; } .example-list { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); } }
 @media (max-width: 480px) { .edition { display: none; } .hero h1 { font-size: 29px; } .tabs { gap: 18px; } .tabs button { font-size: 11px; } .field-grid, .choices-grid { grid-template-columns: 1fr; } .aspect-row { align-items: start; flex-direction: column; gap: 8px; } .segment { align-self: end; } .task-bar select { width: 100%; } }
+@media (max-width: 480px) { .tabs { gap: 10px; } .tabs button { font-size: 10px; } .reference-view .view-heading { align-items: start; flex-direction: column; gap: 14px; } .reference-criteria th, .reference-criteria td { padding: 12px 8px; } }
 @media (max-width: 480px) { .transfer-bar { align-items: stretch; flex-direction: column; } .transfer-bar > div { flex-wrap: wrap; } }

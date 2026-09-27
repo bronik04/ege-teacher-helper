@@ -21,6 +21,28 @@ function acceptFiveQuestions() {
 }
 
 describe('teacher checking flow', () => {
+  it('opens reference materials from a check and returns without losing unsaved marks', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Аспект 1: полно' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Справочные материалы' }));
+    expect(screen.getByRole('heading', { name: 'Справочные материалы' })).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: 'Критерии задания' })).toBeInTheDocument();
+    expect(screen.getByRole('rowheader', { name: /^К1/ })).toBeInTheDocument();
+    expect(screen.getByText(/134 знака/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Вернуться к проверке' }));
+    expect(screen.getByRole('button', { name: 'Аспект 1: полно' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getAllByText(/К1 · Решение коммуникативной задачи/)).toHaveLength(2);
+  });
+
+  it('shows independent question scoring for speaking 1 and sourced examples', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Справочные материалы' }));
+    fireEvent.change(screen.getByRole('combobox', { name: 'Задание в справке' }), { target: { value: 'speaking1' } });
+    expect(screen.getByText(/Каждый из пяти вопросов оценивается отдельно/)).toBeInTheDocument();
+    expect(screen.queryByRole('rowheader', { name: /^К1/ })).not.toBeInTheDocument();
+    expect(screen.getAllByText('ФИПИ: разбор ответа', { selector: 'span' })).toHaveLength(2);
+    expect(screen.getAllByRole('link', { name: /Открыть разбор ФИПИ/ })[0]).toHaveAttribute('href', expect.stringContaining('#page=29'));
+  });
   it('starts with unset aspect marks and shows relevant FIPI help', () => {
     render(<App />);
     expect(screen.getByText(/Предварительно/)).toBeInTheDocument();

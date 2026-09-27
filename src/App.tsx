@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ChangeEvent } from 'react';
 import AssessmentForm from './components/AssessmentForm';
 import RecordList from './components/RecordList';
+import ReferencePage from './components/ReferencePage';
 import RubricHelp from './components/RubricHelp';
 import ScorePanel from './components/ScorePanel';
 import { FIPI_2026 } from './rubric/fipi2026';
@@ -36,7 +37,8 @@ export default function App() {
   const [initial] = useState(savedRecords);
   const [records, setRecords] = useState(initial.records);
   const [error, setError] = useState(initial.error);
-  const [view, setView] = useState<'check' | 'records'>('check');
+  const [view, setView] = useState<'check' | 'records' | 'reference'>('check');
+  const [referenceTaskId, setReferenceTaskId] = useState<TaskId>('writing28');
   const [draft, setDraft] = useState<AssessmentDraft>(() => freshDraft('writing28'));
   const [label, setLabel] = useState('');
   const [note, setNote] = useState('');
@@ -47,6 +49,7 @@ export default function App() {
   const [importing, setImporting] = useState(false);
   const task = FIPI_2026[draft.taskId];
   const result = calculateAssessment(draft);
+  function openReference() { setReferenceTaskId(draft.taskId); setView('reference'); }
 
   function changeDraft(next: AssessmentDraft) { setDraft(next); setDirty(true); setNotice(''); }
   function leaveCurrent(): boolean { return !dirty || window.confirm('Есть несохранённые изменения. Продолжить?'); }
@@ -120,10 +123,12 @@ export default function App() {
         <p>Отмечайте содержание, ошибки и экспертные решения. Итог пересчитается сразу, а справка останется под рукой.</p></div>
         <div className="hero-figure" aria-hidden="true"><span>+</span><span>±</span><span>−</span></div></div>
       <nav className="tabs" aria-label="Разделы"><button type="button" className={view === 'check' ? 'active' : ''} onClick={newCheck}>Новая проверка</button>
-        <button type="button" className={view === 'records' ? 'active' : ''} onClick={() => setView('records')}>Сохранённые работы <span className="tab-count" aria-hidden="true">{records.length}</span></button></nav>
+        <button type="button" className={view === 'records' ? 'active' : ''} onClick={() => setView('records')}>Сохранённые работы <span className="tab-count" aria-hidden="true">{records.length}</span></button>
+        <button type="button" className={view === 'reference' ? 'active' : ''} onClick={openReference}>Справочные материалы</button></nav>
       {error && <div className="alert" role="alert">{error}</div>}
       {notice && <div className="notice" role="status">{notice}</div>}
-      {view === 'records' ? <section className="saved-view"><div className="view-heading"><div><span className="eyebrow">Ваши проверки</span><h2>Сохранённые работы</h2></div>
+      {view === 'reference' ? <ReferencePage taskId={referenceTaskId} onTaskChange={setReferenceTaskId} onBack={() => setView('check')} />
+      : view === 'records' ? <section className="saved-view"><div className="view-heading"><div><span className="eyebrow">Ваши проверки</span><h2>Сохранённые работы</h2></div>
         <span className="muted">Данные доступны в этом браузере</span></div>
         <div className="transfer-bar"><button type="button" onClick={() => setView('check')}>Вернуться к проверке</button>
           <div><button type="button" onClick={downloadExport}>Скачать JSON</button>
@@ -136,7 +141,7 @@ export default function App() {
             <span className="task-meta">{task.section} <span>·</span> до {task.maxScore} баллов</span></div>
           <div className="workspace-grid"><div className="main-column">
             <AssessmentForm task={task} draft={draft} onChange={changeDraft} />
-            <RubricHelp task={task} />
+            <RubricHelp task={task} onOpenReference={openReference} />
           </div><aside className="sidebar"><ScorePanel task={task} result={result} />
             <section className="card save-card"><span className="eyebrow">Сохранить работу</span>
               <label className="field"><span>Метка ученика</span><input value={label} maxLength={100} placeholder="Например, Ученик А"
