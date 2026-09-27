@@ -64,6 +64,7 @@ main { max-width: 1430px; margin: auto; padding: 32px 4vw 72px; }
 .status.complete { background: #3a6950; color: #d6f1dc; }
 .score-breakdown { border-top: 1px solid #496559; }
 .score-breakdown > div { display: flex; justify-content: space-between; gap: 8px; padding: 13px 0; border-bottom: 1px solid #496559; color: #d3e0d5; font-size: 11px; line-height: 1.45; }
+.score-breakdown small { display: block; margin-top: 5px; color: #b6cebc; font-size: 10px; line-height: 1.5; }
 .score-breakdown strong { color: #fff; font-size: 13px; white-space: nowrap; }
 .messages { margin-top: 18px; font-size: 11px; line-height: 1.55; }
 .messages strong { font-size: 12px; }

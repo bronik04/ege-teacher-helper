@@ -171,7 +171,7 @@ export default function App() {
           <div className="workspace-grid"><div className="main-column">
             <AssessmentForm task={task} draft={draft} onChange={changeDraft} />
             <RubricHelp task={task} onOpenReference={openReference} />
-          </div><aside className="sidebar"><ScorePanel task={task} result={result} />
+          </div><aside className="sidebar"><ScorePanel task={task} draft={draft} result={result} />
             <section className="card save-card"><span className="eyebrow">Сохранить работу</span>
               <label className="field"><span>Метка ученика</span><input value={label} maxLength={100} placeholder="Например, Ученик А"
                 onChange={(event) => { persistWorking(draft, event.target.value, note); setLabel(event.target.value); setDirty(true); setNotice(''); }} /></label>

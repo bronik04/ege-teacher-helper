@@ -23,6 +23,12 @@ function acceptFiveQuestions() {
 }
 
 describe('teacher checking flow', () => {
+  it('explains a calculated organization point using the entered error count', () => {
+    render(<App />);
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Ошибки в организации' }), { target: { value: '2' } });
+    expect(screen.getByText('2 ошибки в организации.')).toBeInTheDocument();
+  });
+
   it('restores an unfinished check after the page is reopened', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Аспект 1: полно' }));
