@@ -3,6 +3,8 @@ import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import App from './App';
+import { loadRecords } from './storage/records';
+import { WORKING_DRAFT_KEY } from './storage/working-draft';
 
 beforeEach(() => {
   window.localStorage.clear();
@@ -21,6 +23,96 @@ function acceptFiveQuestions() {
 }
 
 describe('teacher checking flow', () => {
+  it('restores an unfinished check after the page is reopened', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Аспект 1: полно' }));
+    fireEvent.change(screen.getByRole('textbox', { name: 'Метка ученика' }), { target: { value: 'Ученик Б' } });
+    fireEvent.change(screen.getByRole('textbox', { name: 'Заметка' }), { target: { value: 'Проверить иероглифику' } });
+    cleanup();
+    render(<App />);
+    expect(screen.getByRole('button', { name: 'Аспект 1: полно' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('textbox', { name: 'Метка ученика' })).toHaveValue('Ученик Б');
+    expect(screen.getByRole('textbox', { name: 'Заметка' })).toHaveValue('Проверить иероглифику');
+    expect(screen.getByRole('status')).toHaveTextContent(/Восстановлен автосохранённый черновик/);
+  });
+
+  it('clears the recovery copy after a check is saved normally', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Аспект 1: полно' }));
+    fireEvent.change(screen.getByRole('textbox', { name: 'Метка ученика' }), { target: { value: 'Ученик Б' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранить проверку' }));
+    cleanup();
+    render(<App />);
+    expect(screen.getByRole('button', { name: 'Аспект 1: полно' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('textbox', { name: 'Метка ученика' })).toHaveValue('');
+    expect(screen.queryByText(/Восстановлен автосохранённый черновик/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранённые работы' }));
+    expect(screen.getByText('Ученик Б')).toBeInTheDocument();
+  });
+
+  it('discards the old recovery copy after a confirmed task switch', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Аспект 1: полно' }));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    chooseTask('speaking1');
+    cleanup();
+    render(<App />);
+    expect(screen.getByRole('button', { name: 'Аспект 1: полно' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.queryByText(/Восстановлен автосохранённый черновик/)).not.toBeInTheDocument();
+  });
+
+  it('recovers from a temporary autosave failure on the next edit', () => {
+    const setItem = vi.spyOn(Storage.prototype, 'setItem');
+    setItem.mockImplementationOnce(() => { throw new Error('temporary storage failure'); });
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Аспект 1: полно' }));
+    expect(screen.getByRole('alert')).toHaveTextContent(/Не удалось автосохранить/);
+    fireEvent.click(screen.getByRole('button', { name: 'Аспект 2: полно' }));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    cleanup();
+    render(<App />);
+    expect(screen.getByRole('button', { name: 'Аспект 2: полно' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('reports a damaged recovery copy and starts a new one only after an edit', () => {
+    window.localStorage.setItem(WORKING_DRAFT_KEY, '{broken');
+    render(<App />);
+    expect(screen.getByRole('alert')).toHaveTextContent(/Не удалось восстановить автосохранённый черновик/);
+    expect(window.localStorage.getItem(WORKING_DRAFT_KEY)).toBe('{broken');
+    fireEvent.click(screen.getByRole('button', { name: 'Аспект 1: полно' }));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    cleanup();
+    render(<App />);
+    expect(screen.getByRole('button', { name: 'Аспект 1: полно' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('does not recreate a deleted saved record from its recovery copy', () => {
+    render(<App />);
+    chooseTask('speaking1');
+    acceptFiveQuestions();
+    fireEvent.change(screen.getByRole('textbox', { name: 'Метка ученика' }), { target: { value: 'Ученик А' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранить проверку' }));
+    const deletedId = loadRecords(window.localStorage)[0].id;
+    fireEvent.click(screen.getByRole('button', { name: 'Вопрос 1: не засчитать' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранённые работы' }));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Удалить' }));
+    expect(loadRecords(window.localStorage)).toHaveLength(0);
+    cleanup();
+    render(<App />);
+    expect(screen.getByRole('button', { name: 'Вопрос 1: не засчитать' })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранить проверку' }));
+    expect(loadRecords(window.localStorage)[0].id).not.toBe(deletedId);
+  });
+
+  it('removes an old saved notice when new note edits are only autosaved', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранить проверку' }));
+    expect(screen.getByRole('status')).toHaveTextContent(/Черновик сохранён/);
+    fireEvent.change(screen.getByRole('textbox', { name: 'Заметка' }), { target: { value: 'Новая заметка' } });
+    expect(screen.queryByText(/Черновик сохранён/)).not.toBeInTheDocument();
+  });
+
   it('opens reference materials from a check and returns without losing unsaved marks', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Аспект 1: полно' }));
