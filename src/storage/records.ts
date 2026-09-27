@@ -13,6 +13,11 @@ const FLAGS: (keyof AssessmentDraft)[] = [
   'hasIntroduction', 'hasConclusion', 'isLogical', 'linksAdequate',
   'assessedFragmentConfirmed', 'plagiarismOver30',
 ];
+const DRAFT_KEYS = new Set<keyof AssessmentDraft>([
+  'taskId', 'rubricYear', 'noAnswer', 'aspects', 'questionAccepted',
+  ...COUNTS, ...FLAGS, 'expertLevels',
+]);
+const RECORD_KEYS = new Set<keyof AssessmentRecord>(['id', 'createdAt', 'updatedAt', 'label', 'note', 'draft']);
 
 function object(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -21,6 +26,7 @@ function object(value: unknown): value is Record<string, unknown> {
 function validDraft(value: unknown): value is AssessmentDraft {
   if (!object(value) || !TASK_IDS.includes(value.taskId as TaskId) || value.rubricYear !== 2026
     || typeof value.noAnswer !== 'boolean' || !Array.isArray(value.aspects)) return false;
+  if (Object.keys(value).some((key) => !DRAFT_KEYS.has(key as keyof AssessmentDraft))) return false;
   const task = FIPI_2026[value.taskId as TaskId];
   if (value.aspects.length !== task.aspects.length || !value.aspects.every((mark) => MARKS.includes(mark))) return false;
   if (value.questionAccepted !== undefined && (!Array.isArray(value.questionAccepted)
@@ -47,6 +53,7 @@ function validDraft(value: unknown): value is AssessmentDraft {
 
 export function isAssessmentRecord(value: unknown): value is AssessmentRecord {
   if (!object(value)) return false;
+  if (Object.keys(value).some((key) => !RECORD_KEYS.has(key as keyof AssessmentRecord))) return false;
   return typeof value.id === 'string' && value.id.length > 0
     && typeof value.createdAt === 'string' && !Number.isNaN(Date.parse(value.createdAt))
     && typeof value.updatedAt === 'string' && !Number.isNaN(Date.parse(value.updatedAt))

@@ -55,4 +55,11 @@ describe('assessment JSON transfer', () => {
   it('rejects duplicate IDs within an imported file', () => {
     expect(() => importRecords(JSON.stringify({ formatVersion: 1, records: [base, base] }), [])).toThrow();
   });
+
+  it('rejects unexpected answer content instead of storing it', () => {
+    const extraRecord = { ...base, answerText: 'Личный текст ответа' };
+    expect(() => importRecords(JSON.stringify({ formatVersion: 1, records: [extraRecord] }), [])).toThrow();
+    const extraDraft = { ...base, draft: { ...base.draft, answerText: 'Личный текст ответа' } };
+    expect(() => importRecords(JSON.stringify({ formatVersion: 1, records: [extraDraft] }), [])).toThrow();
+  });
 });
