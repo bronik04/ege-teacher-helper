@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
 import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { useState } from 'react';
 import ReferencePage from './ReferencePage';
 import type { TaskId } from '../rubric/types';
 
@@ -41,5 +42,42 @@ describe('complete teacher scales', () => {
     render(<ReferencePage taskId="writing28" onTaskChange={() => {}} onBack={() => {}} />);
     expect(screen.getByText(/К1 равен 0/)).toBeInTheDocument();
     expect(screen.getAllByText(/меньше 135 знаков/).length).toBeGreaterThan(0);
+  });
+});
+
+describe('worked examples', () => {
+  it('explains the published letter score by criterion and identifies its source', () => {
+    render(<ReferencePage taskId="writing28" onTaskChange={() => {}} onBack={() => {}} />);
+    const card = screen.getByRole('article', { name: 'Письмо: один неполный аспект и ошибки оформления' });
+    expect(within(card).getByText('ФИПИ: разбор ответа')).toBeInTheDocument();
+    expect(within(card).getByText('Итого 5 из 8')).toBeInTheDocument();
+    fireEvent.click(within(card).getByText('Разбор по критериям'));
+    expect(within(card).getByText('Фрагмент ответа')).toBeInTheDocument();
+    expect(within(card).getByText(/из трёх вопросов о выставке принят один/)).toBeInTheDocument();
+    expect(within(card).getByText(/Две ошибки в организации/)).toBeInTheDocument();
+    expect(within(card).getByText(/ФИПИ 2026, с. 101/)).toBeInTheDocument();
+  });
+
+  it('distinguishes a whole-task zero from a partial example with no total', () => {
+    render(<ReferencePage taskId="writing28" onTaskChange={() => {}} onBack={() => {}} />);
+    const short = screen.getByRole('article', { name: '134 знака: ноль за всё письмо' });
+    expect(within(short).getByText('Учебный случай')).toBeInTheDocument();
+    fireEvent.click(within(short).getByText('Разбор по критериям'));
+    expect(within(short).getByText(/Объём меньше 135 знаков: всё задание/)).toBeInTheDocument();
+    cleanup();
+    render(<ReferencePage taskId="speaking1" onTaskChange={() => {}} onBack={() => {}} />);
+    const question = screen.getByRole('article', { name: 'Местоположение вместо адреса' });
+    expect(within(question).getByText('Остальные вопросы не оценивались')).toBeInTheDocument();
+  });
+
+  it('changes examples when the teacher selects another task', () => {
+    function SelectableReference() {
+      const [taskId, setTaskId] = useState<TaskId>('writing28');
+      return <ReferencePage taskId={taskId} onTaskChange={setTaskId} onBack={() => {}} />;
+    }
+    render(<SelectableReference />);
+    fireEvent.change(screen.getByRole('combobox', { name: 'Задание в справке' }), { target: { value: 'speaking3' } });
+    expect(screen.getByRole('article', { name: 'Содержание частично, язык — ноль' })).toBeInTheDocument();
+    expect(screen.queryByRole('article', { name: 'Письмо: один неполный аспект и ошибки оформления' })).not.toBeInTheDocument();
   });
 });

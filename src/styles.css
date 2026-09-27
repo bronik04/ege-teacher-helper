@@ -112,11 +112,27 @@ main { max-width: 1430px; margin: auto; padding: 32px 4vw 72px; }
 .criterion-code { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; margin-right: 9px; padding: 3px 5px; border-radius: 6px; background: #f6e9e3; color: #ac5644; font-size: 11px; }
 .reference-examples { padding: 7px 0; }
 .example-list { display: grid; gap: 12px; }
-.example-card { padding: 20px; }
+.example-card { min-width: 0; padding: 20px; overflow-wrap: anywhere; }
 .example-card h4 { margin: 10px 0 7px; font-size: 15px; }
 .example-card p { margin: 0 0 12px; color: #65796a; font-size: 12px; line-height: 1.65; }
 .example-card > strong { display: block; color: #294c39; font-size: 12px; line-height: 1.6; }
 .example-card a { display: inline-block; margin-top: 13px; color: #a95241; font-size: 11px; font-weight: 800; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.example-details { margin-top: 13px; border-top: 1px solid #e5ece3; }
+.example-details summary { display: flex; align-items: center; min-height: 44px; color: #37624a; font-size: 12px; font-weight: 800; cursor: pointer; }
+.example-details summary:focus-visible { outline: 3px solid #dd9b54; outline-offset: 3px; }
+.example-body { padding: 4px 0 2px; }
+.example-body h5 { margin: 16px 0 7px; color: #344c3b; font-size: 12px; }
+.example-body b { color: #344c3b; }
+.example-excerpt { margin: 12px 0; padding: 12px 14px; border-radius: 9px; background: #f7faf5; }
+.example-excerpt span { display: block; margin-bottom: 5px; color: #819384; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+.example-excerpt p { margin: 0; color: #344c3b; font-size: 13px; overflow-wrap: anywhere; }
+.example-aspects { margin: 0; padding-left: 18px; color: #536d5a; font-size: 12px; line-height: 1.6; }
+.example-aspects li { margin-bottom: 5px; }
+.example-criteria { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.example-criteria li { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 8px; padding: 8px 0; border-top: 1px solid #edf1e9; color: #536d5a; font-size: 12px; line-height: 1.5; }
+.example-criteria strong { color: #a95241; white-space: nowrap; }
+.example-card .example-zero { margin: 12px 0 0; padding: 10px 12px; border-radius: 8px; background: #fff1ec; color: #a34b3b; font-weight: 700; }
+.example-card .example-source { margin: 14px 0 0; color: #7d8d80; font-size: 11px; }
 .example-kind { display: inline-block; padding: 5px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; }
 .example-kind.official { background: #e9f2ea; color: #3b7350; }
 .example-kind.educational { background: #f8eee2; color: #9b6537; }
@@ -173,6 +189,7 @@ footer { padding: 25px 4vw; border-top: 1px solid #e2e9e0; color: #94a296; font-
 @media (max-width: 900px) { .reference-layout { grid-template-columns: minmax(0, 1fr); } .reference-examples { padding: 0; } .example-list { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); } }
 @media (max-width: 480px) { .edition { display: none; } .hero h1 { font-size: 29px; } .tabs { gap: 18px; } .tabs button { font-size: 11px; } .field-grid, .choices-grid { grid-template-columns: 1fr; } .aspect-row { align-items: start; flex-direction: column; gap: 8px; } .segment { align-self: end; } .task-bar select { width: 100%; } }
 @media (max-width: 480px) { .tabs { gap: 10px; } .tabs button { font-size: 10px; } .reference-view .view-heading { align-items: start; flex-direction: column; gap: 14px; } .reference-criteria th, .reference-criteria td { padding: 12px 8px; } }
+@media (max-width: 480px) { .example-criteria li { grid-template-columns: minmax(0, 1fr); gap: 3px; } }
 @media (max-width: 480px) { .transfer-bar { align-items: stretch; flex-direction: column; } .transfer-bar > div { flex-wrap: wrap; } }
 @media (max-width: 600px) { .report-actions { flex-direction: column; } .report-sheet { padding: 24px 18px; } .report-header { align-items: start; flex-direction: column; } .report-meta { grid-template-columns: 1fr; gap: 12px; } .report-criteria th, .report-criteria td { padding: 9px 6px; } }
 @media screen and (max-width: 760px) {

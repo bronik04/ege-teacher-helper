@@ -18,8 +18,6 @@ export interface ReferenceExample {
   total: number | null;
   page: number;
   zeroReason?: string;
-  situation: string;
-  outcome: string;
 }
 
 interface ReferenceEntry {
@@ -43,8 +41,6 @@ export const REFERENCE_EXAMPLES: Record<TaskId, ReferenceEntry> = {
           { code: 'К4', score: 1, reason: 'Три иероглифические и две пунктуационные ошибки.' },
         ],
         total: 5, page: 101,
-        situation: 'В письме 188 знаков; из трёх вопросов о выставке принят один, есть ошибки организации и языка.',
-        outcome: 'К1 — 2, К2 — 1, К3 — 1, К4 — 1. Итого 5 из 8.',
       },
       {
         id: 'writing28-fipi-105', kind: 'official', title: 'Ноль по К2–К4 не обнуляет письмо',
@@ -58,8 +54,6 @@ export const REFERENCE_EXAMPLES: Record<TaskId, ReferenceEntry> = {
           { code: 'К4', score: 0, reason: 'Одиннадцать иероглифических и две пунктуационные ошибки.' },
         ],
         total: 1, page: 105,
-        situation: 'Часть содержания раскрыта, но организация, язык и иероглифика получили ноль.',
-        outcome: 'К1 — 1, К2 — 0, К3 — 0, К4 — 0. Итого 1 из 8.',
       },
       {
         id: 'writing28-short', kind: 'educational', title: '134 знака: ноль за всё письмо',
@@ -72,7 +66,6 @@ export const REFERENCE_EXAMPLES: Record<TaskId, ReferenceEntry> = {
           { code: 'К4', score: 0, reason: 'При К1 = 0 остальные критерии обнуляются.' },
         ],
         total: 0, page: 140, zeroReason: 'Объём меньше 135 знаков: всё задание оценивается в 0.',
-        situation: 'Письмо короче минимально допустимого объёма.', outcome: 'Всё задание — 0 из 8.',
       },
     ],
   },
@@ -91,8 +84,6 @@ export const REFERENCE_EXAMPLES: Record<TaskId, ReferenceEntry> = {
           { code: 'К4', score: 2, reason: 'Две иероглифические и одна пунктуационная ошибка.' },
         ],
         total: 9, page: 125,
-        situation: 'Вывод неполный, при этом текст логичен и правильно разделён на абзацы.',
-        outcome: 'К1 — 2, К2 — 3, К3 — 2, К4 — 2. Итого 9 из 12.',
       },
       {
         id: 'writing29-short', kind: 'educational', title: '143 знака: ноль за всё высказывание',
@@ -105,7 +96,6 @@ export const REFERENCE_EXAMPLES: Record<TaskId, ReferenceEntry> = {
           { code: 'К4', score: 0, reason: 'При К1 = 0 остальные критерии обнуляются.' },
         ],
         total: 0, page: 141, zeroReason: 'Объём меньше 144 знаков: всё задание оценивается в 0.',
-        situation: 'Ответ содержит 143 знака.', outcome: 'Всё задание — 0 из 12.',
       },
     ],
   },
@@ -119,8 +109,6 @@ export const REFERENCE_EXAMPLES: Record<TaskId, ReferenceEntry> = {
         aspects: ['Запрос адреса: − — вопрос о местоположении не выполняет установку.'],
         criteria: [{ code: 'Вопрос 1', score: 0, reason: 'В вопросе не запрошен именно адрес клиники.' }],
         total: null, page: 29,
-        situation: 'Вместо адреса ученик спрашивает, где находится клиника.',
-        outcome: 'Этот вопрос — 0; остальные четыре здесь не оценивались.',
       },
       {
         id: 'speaking1-fipi-hours', kind: 'official', title: 'Только время открытия',
@@ -129,7 +117,6 @@ export const REFERENCE_EXAMPLES: Record<TaskId, ReferenceEntry> = {
         aspects: ['Часы работы: − — время закрытия не выяснено.'],
         criteria: [{ code: 'Вопрос 2', score: 0, reason: 'Вопрос сообщает лишь о времени открытия; нужен диапазон часов работы.' }],
         total: null, page: 29,
-        situation: 'Названо только время открытия.', outcome: 'Этот вопрос — 0; итог за пять вопросов не вычисляется.',
       },
       {
         id: 'speaking1-hours-good', kind: 'educational', title: 'Указан полный диапазон часов',
@@ -138,7 +125,6 @@ export const REFERENCE_EXAMPLES: Record<TaskId, ReferenceEntry> = {
         aspects: ['Часы работы: + — вопрос охватывает время начала и окончания работы.'],
         criteria: [{ code: 'Вопрос 2', score: 1, reason: 'Запрошен полный диапазон часов работы.' }],
         total: null, page: 29,
-        situation: 'Запрошено время открытия и закрытия.', outcome: 'Этот вопрос — 1; итог за пять вопросов не вычисляется.',
       },
     ],
   },
@@ -156,8 +142,6 @@ export const REFERENCE_EXAMPLES: Record<TaskId, ReferenceEntry> = {
           { code: 'К3', score: 2, reason: 'Отмечена одна лексико-грамматическая ошибка.' },
         ],
         total: 6, page: 64,
-        situation: 'В ответе 14 фраз; один аспект отсутствует, остальные раскрыты.',
-        outcome: 'К1 — 2, К2 — 2, К3 — 2. Итого 6 из 7.',
       },
       {
         id: 'speaking2-short', kind: 'educational', title: 'Пять фраз: всё задание обнуляется',
@@ -170,7 +154,6 @@ export const REFERENCE_EXAMPLES: Record<TaskId, ReferenceEntry> = {
           { code: 'К3', score: 0, reason: 'При К1 = 0 критерий обнуляется.' },
         ],
         total: 0, page: 85, zeroReason: 'К1 = 0 из-за объёма: всё задание — 0.',
-        situation: 'Ответ содержит пять фраз.', outcome: 'Всё задание — 0 из 7.',
       },
     ],
   },
@@ -188,8 +171,6 @@ export const REFERENCE_EXAMPLES: Record<TaskId, ReferenceEntry> = {
           { code: 'К3', score: 0, reason: 'Понимание затруднено многочисленными языковыми и фонетическими ошибками.' },
         ],
         total: 2, page: 77,
-        situation: 'В проектном сообщении 20 фраз; один аспект отсутствует, один неполон.',
-        outcome: 'К1 — 1, К2 — 1, К3 — 0. Итого 2 из 8.',
       },
       {
         id: 'speaking3-k2-zero', kind: 'educational', title: 'Ноль за организацию не обнуляет содержание',
@@ -201,8 +182,6 @@ export const REFERENCE_EXAMPLES: Record<TaskId, ReferenceEntry> = {
           { code: 'К2', score: 0, reason: 'Нет ни вступления, ни заключения.' },
         ],
         total: null, page: 87,
-        situation: 'Содержание полное, но вступление и заключение отсутствуют.',
-        outcome: 'К1 — 3, К2 — 0; К3 и итог здесь не оценивались.',
       },
     ],
   },
