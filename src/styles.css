@@ -83,6 +83,11 @@ main { max-width: 1430px; margin: auto; padding: 32px 4vw 72px; }
 .source-link { display: flex; justify-content: space-between; margin-top: 18px; padding: 12px 14px; border-radius: 10px; background: #f0f5ee; color: #35614c; font-size: 12px; font-weight: 800; text-decoration: none; }
 .source-meta { margin-bottom: 0; color: #9baa9b; font-size: 10px; }
 .view-heading { display: flex; align-items: end; justify-content: space-between; margin: 28px 0 20px; }
+.transfer-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.transfer-bar > div { display: flex; gap: 10px; }
+.transfer-bar button, .import-label { display: inline-flex; align-items: center; padding: 10px 14px; border: 1px solid #d5e2d3; border-radius: 10px; background: #fff; color: #37624a; font-size: 12px; font-weight: 800; cursor: pointer; }
+.import-label:focus-within { outline: 3px solid #dd9b54; outline-offset: 3px; }
+.import-label input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .record-list { display: grid; gap: 12px; }
 .record-card { display: flex; justify-content: space-between; gap: 20px; padding: 22px 25px; border: 1px solid #e0e8df; border-radius: 16px; background: #fff; }
 .record-card h2 { margin: 6px 0; font-size: 17px; }
@@ -101,3 +106,4 @@ footer { padding: 25px 4vw; border-top: 1px solid #e2e9e0; color: #94a296; font-
 @media (max-width: 1050px) { .workspace-grid { grid-template-columns: minmax(0, 1fr) 300px; } .hero-figure { margin-right: 0; } .hero-figure span { width: 50px; height: 50px; } }
 @media (max-width: 760px) { main { padding: 20px 16px 50px; } .site-header { height: 68px; padding: 0 16px; } .hero { padding: 28px 24px; } .hero-figure { display: none; } .workspace-grid { grid-template-columns: 1fr; } .sidebar { position: static; grid-row: 1; } .task-bar { flex-wrap: wrap; } .task-bar select { flex: 1; min-width: 200px; } .task-meta { width: 100%; } .card, .score-panel { padding: 20px; } .record-card { flex-direction: column; } .record-actions { flex-wrap: wrap; } }
 @media (max-width: 480px) { .edition { display: none; } .hero h1 { font-size: 29px; } .tabs { gap: 18px; } .tabs button { font-size: 11px; } .field-grid, .choices-grid { grid-template-columns: 1fr; } .aspect-row { align-items: start; flex-direction: column; gap: 8px; } .segment { align-self: end; } .task-bar select { width: 100%; } }
+@media (max-width: 480px) { .transfer-bar { align-items: stretch; flex-direction: column; } .transfer-bar > div { flex-wrap: wrap; } }

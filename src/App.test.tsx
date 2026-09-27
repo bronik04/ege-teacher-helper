@@ -68,4 +68,23 @@ describe('teacher checking flow', () => {
     expect(screen.getByRole('combobox', { name: 'Задание' })).toHaveValue('writing28');
     expect(screen.getByRole('button', { name: 'Аспект 1: полно' })).toHaveAttribute('aria-pressed', 'true');
   });
+
+  it('imports a valid file and keeps the current draft when import fails', async () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Аспект 1: полно' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранённые работы' }));
+    const input = screen.getByLabelText('Импорт JSON');
+    const valid = { formatVersion: 1, records: [{ id: 'imported', label: 'Из файла', note: '',
+      createdAt: '2026-09-26T12:00:00.000Z', updatedAt: '2026-09-26T12:00:00.000Z',
+      draft: { taskId: 'speaking1', rubricYear: 2026, noAnswer: false, aspects: [],
+        questionAccepted: [true, true, true, true, true] } }] };
+    fireEvent.change(input, { target: { files: [new File([JSON.stringify(valid)], 'valid.json', { type: 'application/json' })] } });
+    expect(await screen.findByText('Из файла')).toBeInTheDocument();
+    expect(window.localStorage.getItem('ege-assessments-v1')).toContain('imported');
+    fireEvent.change(input, { target: { files: [new File(['{broken'], 'bad.json', { type: 'application/json' })] } });
+    expect(await screen.findByRole('alert')).toHaveTextContent(/Не удалось импортировать/);
+    expect(window.localStorage.getItem('ege-assessments-v1')).toContain('imported');
+    fireEvent.click(screen.getByRole('button', { name: 'Вернуться к проверке' }));
+    expect(screen.getByRole('button', { name: 'Аспект 1: полно' })).toHaveAttribute('aria-pressed', 'true');
+  });
 });
