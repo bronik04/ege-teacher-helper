@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "NODE_OPTIONS=--no-experimental-webstorage vitest run"
+    "test": "NODE_OPTIONS=--no-experimental-webstorage vitest run",
+    "check:pwa": "node scripts/check-pwa-build.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",
@@ -21,6 +22,7 @@
     "jsdom": "^26.0.0",
     "typescript": "^5.0.0",
     "vite": "^7.0.0",
+    "vite-plugin-pwa": "^1.3.0",
     "vitest": "^3.0.0"
   }
 }
