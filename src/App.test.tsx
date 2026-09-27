@@ -204,8 +204,7 @@ describe('teacher checking flow', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Аспект 1: полно' }));
     fireEvent.click(screen.getByRole('button', { name: 'Справочные материалы' }));
     expect(screen.getByRole('heading', { name: 'Справочные материалы' })).toBeInTheDocument();
-    expect(screen.getByRole('table', { name: 'Критерии задания' })).toBeInTheDocument();
-    expect(screen.getByRole('rowheader', { name: /^К1/ })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /^К1 / })).toBeInTheDocument();
     expect(screen.getByText(/134 знака/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Вернуться к проверке' }));
     expect(screen.getByRole('button', { name: 'Аспект 1: полно' })).toHaveAttribute('aria-pressed', 'true');

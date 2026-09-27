@@ -95,6 +95,13 @@ main { max-width: 1430px; margin: auto; padding: 32px 4vw 72px; }
 .reference-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(290px, .7fr); align-items: start; gap: 22px; }
 .reference-rule { margin: 0 0 20px; padding: 14px 16px; border-left: 3px solid #b85e4a; border-radius: 0 8px 8px 0; background: #fbf4ee; color: #654d3f; font-size: 13px; line-height: 1.65; }
 .table-scroll { overflow-x: auto; }
+.criterion-scales { display: grid; gap: 12px; }
+.criterion-scale { min-width: 0; padding: 16px; border: 1px solid #e2ebe0; border-radius: 12px; background: #fff; }
+.criterion-scale h4 { display: flex; align-items: center; margin: 0 0 12px; color: #344c3b; font-size: 14px; }
+.scale-levels { margin: 0; padding: 0; list-style: none; }
+.scale-levels li { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 10px; padding: 9px 0; border-top: 1px solid #edf1e9; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+.scale-levels strong { color: #a95241; white-space: nowrap; }
+.scale-levels span { min-width: 0; color: #536d5a; }
 .reference-criteria table { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1.55; }
 .reference-criteria th, .reference-criteria td { padding: 15px 12px; border-bottom: 1px solid #e6eee4; text-align: left; vertical-align: top; }
 .reference-criteria thead th { color: #718675; background: #f2f6f0; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; }
