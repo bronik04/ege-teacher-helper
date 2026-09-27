@@ -43,6 +43,24 @@ describe('complete teacher scales', () => {
     expect(screen.getByText(/К1 равен 0/)).toBeInTheDocument();
     expect(screen.getAllByText(/меньше 135 знаков/).length).toBeGreaterThan(0);
   });
+
+  it('keeps qualitative language conditions alongside error counts', () => {
+    const cases: [TaskId, [number, RegExp][]][] = [
+      ['writing29', [[2, /высокому уровню.*две–три ошибки.*ограничены, но использованы правильно/]]],
+      ['speaking2', [[2, /соответствуют поставленной задаче.*двух лексико-грамматических/], [1, /в основном соответствуют поставленной задаче.*четырёх лексико-грамматических/]]],
+      ['speaking3', [[3, /соответствуют поставленной задаче.*двух негрубых/], [2, /в основном соответствуют поставленной задаче.*четырёх/], [1, /частично соответствует поставленной задаче.*пяти/]]],
+    ];
+    for (const [taskId, expected] of cases) {
+      const { unmount } = render(<ReferencePage taskId={taskId} onTaskChange={() => {}} onBack={() => {}} />);
+      const language = screen.getByRole('region', { name: /^К3 / });
+      const levels = within(language).getAllByRole('listitem').map((item) => item.textContent ?? '');
+      expected.forEach(([score, pattern]) => {
+        const level = levels.find((item) => item.startsWith(`${score} ${score === 1 ? 'балл' : 'балла'}`));
+        expect(level).toMatch(pattern);
+      });
+      unmount();
+    }
+  });
 });
 
 describe('worked examples', () => {
