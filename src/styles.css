@@ -49,6 +49,8 @@ main { max-width: 1430px; margin: auto; padding: 32px 4vw 72px; }
 .field { display: grid; gap: 7px; color: #5c715f; font-size: 12px; font-weight: 700; }
 .field :is(input, textarea, select) { width: 100%; padding: 11px 12px; border: 1px solid #dbe6d9; border-radius: 10px; background: #fcfdfb; color: #273c30; font-size: 14px; font-weight: 600; }
 .field textarea { resize: vertical; }
+.count-help { margin: 18px 0 2px; color: #647969; font-size: 12px; line-height: 1.65; }
+.count-help a { color: #a95241; font-weight: 800; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .choices-grid { gap: 12px; margin-top: 18px; }
 .choice { min-width: 0; margin: 17px 0 0; padding: 9px 12px; border: 1px solid #e4ebe2; border-radius: 12px; }
 .choice legend { padding: 0 4px; color: #5c715f; font-size: 12px; font-weight: 700; }

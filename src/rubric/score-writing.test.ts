@@ -13,6 +13,7 @@ const w29 = (changes: Partial<AssessmentDraft> = {}): AssessmentDraft => ({
   taskId: 'writing29', rubricYear: 2026, noAnswer: false,
   aspects: ['+', '+', '+', '+', '+'], characterCount: 180, plagiarismOver30: false,
   organizationErrors: 0, lexicalGrammarErrors: 0, hanziErrors: 0, punctuationErrors: 0,
+  expertLevels: { language: 3 },
   ...changes,
 });
 
@@ -47,6 +48,22 @@ describe('writing task 28', () => {
     const confirmed = calculateAssessment({ ...draft, assessedFragmentConfirmed: true });
     expect(confirmed.finalTotal).toBe(8);
     expect(confirmed.reasons.join(' ')).toContain('190');
+  });
+
+  it('keeps an overlength zero provisional until its assessed fragment is confirmed', () => {
+    const draft = w28({ characterCount: 210, aspects: ['−', '−', '−', '+', '+', '+'] });
+    const pending = calculateAssessment(draft);
+    expect(pending.criteria).toEqual({ content: 0, organization: 0, language: 0, script: 0 });
+    expect(pending.finalTotal).toBeNull();
+    expect(pending.missing.join(' ')).toContain('190');
+    expect(calculateAssessment({ ...draft, assessedFragmentConfirmed: true }).finalTotal).toBe(0);
+  });
+
+  it('honors a written organization decision made by the expert', () => {
+    const result = calculateAssessment(w28({ expertLevels: { organization: 0 } }));
+    expect(result.criteria.organization).toBe(0);
+    expect(result.finalTotal).toBe(6);
+    expect(result.reasons.join(' ')).toContain('организации');
   });
 
   it('does not present an incomplete aspect list as a final score', () => {
@@ -96,6 +113,29 @@ describe('writing task 29', () => {
     expect(confirmed.reasons.join(' ')).toContain('200');
   });
 
+  it('keeps zero content provisional above 220 until the first 200 signs are confirmed', () => {
+    const draft = w29({ characterCount: 221, aspects: ['−', '−', '−', '+', '+'] });
+    const result = calculateAssessment(draft);
+    expect(result.criteria).toEqual({ content: 0, organization: 0, language: 0, script: 0 });
+    expect(result.finalTotal).toBeNull();
+    expect(result.missing.join(' ')).toContain('200');
+    expect(calculateAssessment({ ...draft, assessedFragmentConfirmed: true }).finalTotal).toBe(0);
+  });
+
+  it('requires an explicit task-29 language judgment even with zero errors', () => {
+    const pending = calculateAssessment(w29({ expertLevels: {} }));
+    expect(pending.criteria.language).toBeNull();
+    expect(pending.finalTotal).toBeNull();
+    expect(pending.missing.join(' ')).toContain('уровень лексико-грамматического');
+    expect(calculateAssessment(w29({ expertLevels: { language: 2 } })).finalTotal).toBe(11);
+  });
+
+  it('honors a written task-29 organization decision', () => {
+    const result = calculateAssessment(w29({ expertLevels: { language: 3, organization: 0 } }));
+    expect(result.criteria.organization).toBe(0);
+    expect(result.finalTotal).toBe(9);
+  });
+
   it('zeroes every criterion after established textual copying over 30%', () => {
     const result = calculateAssessment(w29({ plagiarismOver30: true }));
     expect(result.criteria).toEqual({ content: 0, organization: 0, language: 0, script: 0 });
@@ -110,14 +150,14 @@ describe('writing task 29', () => {
     // Writing guide, printed pp. 122–124: K1/K2/K3/K4 = 2/3/2/2.
     expect(calculateAssessment(w29({
       aspects: ['±', '±', '+', '+', '+'], lexicalGrammarErrors: 3,
-      hanziErrors: 2, punctuationErrors: 1,
+      hanziErrors: 2, punctuationErrors: 1, expertLevels: { language: 2 },
     })).finalTotal).toBe(9);
     // Writing guide, printed pp. 126–128: K1/K2/K3/K4 = 1/3/0/0.
     // Its K1 outcome differs from the formal rubric for two partial marks;
     // the visible expert level records that contextual judgment.
     expect(calculateAssessment(w29({
       aspects: ['±', '±', '+', '+', '+'], lexicalGrammarErrors: 6,
-      hanziErrors: 6, punctuationErrors: 1, expertLevels: { content: 1, script: 0 },
+      hanziErrors: 6, punctuationErrors: 1, expertLevels: { content: 1, script: 0, language: 0 },
     })).finalTotal).toBe(4);
   });
 });

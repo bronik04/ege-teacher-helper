@@ -29,6 +29,8 @@ describe('teacher checking flow', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Аспект 1: неполно' }));
     expect(screen.getByRole('button', { name: 'Аспект 1: неполно' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('link', { name: /Открыть источник ФИПИ/ })).toHaveAttribute('href', expect.stringContaining('#page=140'));
+    expect(screen.getByText(/Знаки препинания входят в объём/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Правила подсчёта знаков/ })).toHaveAttribute('href', expect.stringContaining('#page=147'));
   });
 
   it('counts a finished five-question assessment and saves it for editing', () => {

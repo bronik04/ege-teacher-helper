@@ -11,10 +11,10 @@ function expertLevel(draft: AssessmentDraft, key: Exclude<CriterionKey, 'questio
   return value !== undefined && Number.isInteger(value) && value >= 0 && value <= max ? value : null;
 }
 
-function zero(reason: string): ScoreResult {
+function zero(reason: string, missing: string[] = [], priorReasons: string[] = []): ScoreResult {
   return {
     criteria: { content: 0, organization: 0, language: 0, script: 0 },
-    provisionalTotal: 0, finalTotal: 0, missing: [], reasons: [reason],
+    provisionalTotal: 0, finalTotal: missing.length ? null : 0, missing, reasons: [...priorReasons, reason],
   };
 }
 
@@ -55,8 +55,13 @@ function lengthCheck(draft: AssessmentDraft, minimum: number, ceiling: number, f
   return 'ok';
 }
 
-function organization(errors: number | null | undefined, max: 2 | 3, missing: string[]): number | null {
-  const n = count(errors);
+function organization(draft: AssessmentDraft, max: 2 | 3, missing: string[], reasons: string[]): number | null {
+  const override = expertLevel(draft, 'organization', max);
+  if (override !== null) {
+    reasons.push('Уровень организации уточнён экспертом по шкале ФИПИ.');
+    return override;
+  }
+  const n = count(draft.organizationErrors);
   if (n === null) {
     missing.push('Укажите число ошибок в организации.');
     return null;
@@ -67,17 +72,18 @@ function organization(errors: number | null | undefined, max: 2 | 3, missing: st
 
 function language(draft: AssessmentDraft, max: 2 | 3, missing: string[], reasons: string[]): number | null {
   const override = expertLevel(draft, 'language', max);
-  if (override !== null) {
-    reasons.push('Уровень лексико-грамматического оформления уточнён экспертом по шкале ФИПИ.');
-    return override;
-  }
   const n = count(draft.lexicalGrammarErrors);
   if (n === null) {
     missing.push('Укажите число лексико-грамматических ошибок.');
     return null;
   }
+  if (override !== null) {
+    reasons.push('Уровень лексико-грамматического оформления уточнён экспертом по шкале ФИПИ.');
+    return override;
+  }
   if (max === 2) return n <= 2 ? 2 : n <= 4 ? 1 : 0;
-  return n <= 1 ? 3 : n <= 3 ? 2 : n === 4 ? 1 : 0;
+  missing.push('Выберите уровень лексико-грамматического оформления с учётом сложности языка и числа ошибок.');
+  return null;
 }
 
 function script28(draft: AssessmentDraft, missing: string[], reasons: string[]): number | null {
@@ -133,10 +139,10 @@ export function scoreWritten28(draft: AssessmentDraft): ScoreResult {
       reasons.push('Балл за содержание уточнён экспертом по шкале ФИПИ.');
     }
   }
-  if (content === 0) return zero('Ноль за решение коммуникативной задачи обнуляет всё задание.');
+  if (content === 0) return zero('Ноль за решение коммуникативной задачи обнуляет всё задание.', missing, reasons);
   const criteria = {
     content,
-    organization: organization(draft.organizationErrors, 2, missing),
+    organization: organization(draft, 2, missing, reasons),
     language: language(draft, 2, missing, reasons),
     script: script28(draft, missing, reasons),
   };
@@ -149,7 +155,7 @@ export function scoreWritten29(draft: AssessmentDraft): ScoreResult {
   const reasons: string[] = [];
   const length = lengthCheck(draft, 144, 220, 200, missing, reasons);
   if (length === 'short') return zero('Менее 144 знаков: ответ не подлежит проверке.');
-  if (draft.plagiarismOver30 === true) return zero('Установлено текстуальное совпадение свыше 30%.');
+  if (draft.plagiarismOver30 === true) return zero('Установлено текстуальное совпадение свыше 30%.', missing, reasons);
   if (draft.plagiarismOver30 !== false) missing.push('Укажите результат проверки текстуальных совпадений.');
   const aspects = aspectCounts(draft, 5, missing);
   let content: number | null = null;
@@ -166,10 +172,10 @@ export function scoreWritten29(draft: AssessmentDraft): ScoreResult {
       reasons.push('Балл за содержание уточнён экспертом по шкале ФИПИ.');
     }
   }
-  if (content === 0) return zero('Ноль за решение коммуникативной задачи обнуляет всё задание.');
+  if (content === 0) return zero('Ноль за решение коммуникативной задачи обнуляет всё задание.', missing, reasons);
   const criteria = {
     content,
-    organization: organization(draft.organizationErrors, 3, missing),
+    organization: organization(draft, 3, missing, reasons),
     language: language(draft, 3, missing, reasons),
     script: script29(draft, missing, reasons),
   };

@@ -64,6 +64,7 @@ export default function AssessmentForm({ task, draft, onChange }: Props) {
           <NumberInput label="Из них грубые фонетические" value={draft.grossPhoneticErrors} onChange={(value) => set('grossPhoneticErrors', value)} /></>}
       </div>
       {isWriting && <>
+        <p className="count-help">Знаки препинания входят в объём; обращение и подпись в письме тоже считаются. Арабские числа и проценты считаются одним знаком. Английские сокращения, пиньинь и традиционные иероглифы в объём не входят. <a href={`${task.source.url}#page=147`} target="_blank" rel="noreferrer">Правила подсчёта знаков ФИПИ ↗</a></p>
         {draft.characterCount !== null && draft.characterCount !== undefined && draft.characterCount > (task.id === 'writing28' ? 209 : 220)
           && <Choice label={`Отметки выставлены только за первые ${task.id === 'writing28' ? 190 : 200} знаков`} value={draft.assessedFragmentConfirmed}
             onChange={(value) => set('assessedFragmentConfirmed', value)} />}
@@ -83,7 +84,7 @@ export default function AssessmentForm({ task, draft, onChange }: Props) {
     </section>}
     {task.id !== 'speaking1' && <section className="card">
       <div className="section-heading"><span className="eyebrow">03 / Экспертное решение</span><h2>Уточнение по шкале ФИПИ</h2></div>
-      <p className="muted">Для пограничных случаев выберите балл после сверки с полной таблицей. Выбор заменяет автоматический уровень по этому критерию.</p>
+      <p className="muted">{task.id === 'writing29' ? 'В задании 29 выберите балл за язык с учётом сложности лексики и грамматики: одно число ошибок не определяет уровень. ' : ''}Для пограничных случаев выберите балл после сверки с полной таблицей. Выбор заменяет автоматический уровень по этому критерию.</p>
       <div className="field-grid">
         {task.criteria.map((criterion) => <label className="field" key={criterion.id}><span>{criterion.title}</span>
           <select value={draft.expertLevels?.[criterion.id as keyof NonNullable<AssessmentDraft['expertLevels']>] ?? ''}
@@ -92,7 +93,7 @@ export default function AssessmentForm({ task, draft, onChange }: Props) {
               const key = criterion.id as keyof NonNullable<AssessmentDraft['expertLevels']>;
               if (event.target.value === '') delete next[key]; else next[key] = Number(event.target.value);
               set('expertLevels', next);
-            }}><option value="">Автоматически</option>{criterion.levels.map((level) => <option key={level.score} value={level.score}>{level.score} балл{level.score === 1 ? '' : level.score >= 2 && level.score <= 4 ? 'а' : 'ов'}</option>)}</select>
+            }}><option value="">{task.id === 'writing29' && criterion.id === 'language' ? 'Выберите балл (обязательно)' : 'Автоматически'}</option>{criterion.levels.map((level) => <option key={level.score} value={level.score}>{level.score} балл{level.score === 1 ? '' : level.score >= 2 && level.score <= 4 ? 'а' : 'ов'}</option>)}</select>
         </label>)}
       </div>
     </section>}
