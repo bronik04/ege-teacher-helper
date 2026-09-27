@@ -2,8 +2,9 @@ import { FIPI_2026 } from '../rubric/fipi2026';
 import { calculateAssessment } from '../rubric/score';
 import type { AssessmentRecord } from '../rubric/types';
 
-export default function RecordList({ records, onOpen, onDelete }: {
-  records: AssessmentRecord[]; onOpen: (record: AssessmentRecord) => void; onDelete: (record: AssessmentRecord) => void;
+export default function RecordList({ records, onOpen, onPrint, onDelete }: {
+  records: AssessmentRecord[]; onOpen: (record: AssessmentRecord) => void;
+  onPrint: (record: AssessmentRecord) => void; onDelete: (record: AssessmentRecord) => void;
 }) {
   if (records.length === 0) return <div className="empty-state"><h2>Пока нет сохранённых работ</h2><p>Проверку можно сохранить даже до выставления итогового балла.</p></div>;
   return <div className="record-list">{records.map((record) => {
@@ -15,6 +16,7 @@ export default function RecordList({ records, onOpen, onDelete }: {
         <small>Обновлено: {new Date(record.updatedAt).toLocaleString('ru-RU')}</small></div>
       <div className="record-actions"><strong>{result.finalTotal === null ? 'Черновик' : `${result.finalTotal} / ${task.maxScore}`}</strong>
         <button type="button" onClick={() => onOpen(record)}>Открыть</button>
+        <button type="button" onClick={() => onPrint(record)}>Печать</button>
         <button type="button" className="text-danger" onClick={() => onDelete(record)}>Удалить</button></div>
     </article>;
   })}</div>;

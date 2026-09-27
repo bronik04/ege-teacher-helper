@@ -23,6 +23,53 @@ function acceptFiveQuestions() {
 }
 
 describe('teacher checking flow', () => {
+  it('opens a printable report for one saved work without changing its data', () => {
+    render(<App />);
+    chooseTask('speaking1');
+    acceptFiveQuestions();
+    fireEvent.change(screen.getByRole('textbox', { name: 'Метка ученика' }), { target: { value: 'Ученик А' } });
+    fireEvent.change(screen.getByRole('textbox', { name: 'Заметка' }), { target: { value: 'Уточнить интонацию' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранить проверку' }));
+    const saved = window.localStorage.getItem('ege-assessments-v1');
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранённые работы' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Печать' }));
+    expect(screen.getByRole('heading', { name: 'Отчёт по работе' })).toBeInTheDocument();
+    expect(screen.getByText('Ученик А')).toBeInTheDocument();
+    expect(screen.getByText('Уточнить интонацию')).toBeInTheDocument();
+    expect(screen.getByText('5 / 5', { selector: '.report-total' })).toBeInTheDocument();
+    expect(screen.getByText('Засчитано 5 из 5 вопросов.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Критерии ФИПИ/ })).toHaveAttribute('href', expect.stringContaining('#page='));
+    const print = vi.spyOn(window, 'print').mockImplementation(() => {});
+    fireEvent.click(screen.getByRole('button', { name: 'Распечатать или сохранить PDF' }));
+    expect(print).toHaveBeenCalledOnce();
+    expect(window.localStorage.getItem('ege-assessments-v1')).toBe(saved);
+    fireEvent.click(screen.getByRole('button', { name: 'К сохранённым работам' }));
+    expect(screen.getByRole('heading', { name: 'Сохранённые работы' })).toBeInTheDocument();
+  });
+
+  it('marks an incomplete printable report as a draft', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранить проверку' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранённые работы' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Печать' }));
+    expect(screen.getByText('Черновик')).toBeInTheDocument();
+    expect(screen.getByRole('rowheader', { name: /^К1/ })).toBeInTheDocument();
+    expect(screen.getByRole('rowheader', { name: /^К2/ })).toBeInTheDocument();
+    expect(screen.getByRole('rowheader', { name: /^К3/ })).toBeInTheDocument();
+    expect(screen.getByRole('rowheader', { name: /^К4/ })).toBeInTheDocument();
+    expect(screen.getByText(/Укажите число знаков/)).toBeInTheDocument();
+    expect(screen.queryByText('Итог')).not.toBeInTheDocument();
+  });
+
+  it('shows a blocking reason only once in the printable report', () => {
+    render(<App />);
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Число знаков' }), { target: { value: '134' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранить проверку' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранённые работы' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Печать' }));
+    expect(screen.getAllByText(/Менее 135 знаков/)).toHaveLength(1);
+  });
+
   it('explains a calculated organization point using the entered error count', () => {
     render(<App />);
     fireEvent.change(screen.getByRole('spinbutton', { name: 'Ошибки в организации' }), { target: { value: '2' } });

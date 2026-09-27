@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ChangeEvent } from 'react';
 import AssessmentForm from './components/AssessmentForm';
 import RecordList from './components/RecordList';
+import PrintReport from './components/PrintReport';
 import ReferencePage from './components/ReferencePage';
 import RubricHelp from './components/RubricHelp';
 import ScorePanel from './components/ScorePanel';
@@ -48,7 +49,8 @@ export default function App() {
   const [initial] = useState(initialState);
   const [records, setRecords] = useState(initial.records);
   const [error, setError] = useState(initial.error);
-  const [view, setView] = useState<'check' | 'records' | 'reference'>('check');
+  const [view, setView] = useState<'check' | 'records' | 'reference' | 'report'>('check');
+  const [reportRecordId, setReportRecordId] = useState<string | null>(null);
   const [referenceTaskId, setReferenceTaskId] = useState<TaskId>('writing28');
   const [draft, setDraft] = useState<AssessmentDraft>(() => initial.working?.draft ?? freshDraft('writing28'));
   const [label, setLabel] = useState(initial.working?.label ?? '');
@@ -60,6 +62,7 @@ export default function App() {
   const [importing, setImporting] = useState(false);
   const task = FIPI_2026[draft.taskId];
   const result = calculateAssessment(draft);
+  const reportRecord = records.find((item) => item.id === reportRecordId);
   function openReference() { setReferenceTaskId(draft.taskId); setView('reference'); }
 
   function persistWorking(nextDraft: AssessmentDraft, nextLabel = label, nextNote = note) {
@@ -144,7 +147,7 @@ export default function App() {
     } finally { event.target.value = ''; setImporting(false); }
   }
 
-  return <div className="app-shell">
+  return <div className={view === 'report' ? 'app-shell print-mode' : 'app-shell'}>
     <header className="site-header"><div className="brand"><span className="brand-mark">中</span><div><strong>Эксперт ЕГЭ</strong><small>китайский язык</small></div></div>
       <span className="edition">Критерии ФИПИ · 2026</span></header>
     <main>
@@ -157,12 +160,13 @@ export default function App() {
       {error && <div className="alert" role="alert">{error}</div>}
       {notice && <div className="notice" role="status">{notice}</div>}
       {view === 'reference' ? <ReferencePage taskId={referenceTaskId} onTaskChange={setReferenceTaskId} onBack={() => setView('check')} />
+      : view === 'report' && reportRecord ? <PrintReport record={reportRecord} onBack={() => setView('records')} />
       : view === 'records' ? <section className="saved-view"><div className="view-heading"><div><span className="eyebrow">Ваши проверки</span><h2>Сохранённые работы</h2></div>
         <span className="muted">Данные доступны в этом браузере</span></div>
         <div className="transfer-bar"><button type="button" onClick={() => setView('check')}>Вернуться к проверке</button>
           <div><button type="button" onClick={downloadExport}>Скачать JSON</button>
             <label className="import-label">Импорт JSON<input type="file" accept=".json,application/json" disabled={importing} onChange={uploadImport} /></label></div></div>
-        <RecordList records={records} onOpen={openRecord} onDelete={remove} /></section>
+        <RecordList records={records} onOpen={openRecord} onPrint={(record) => { setReportRecordId(record.id); setView('report'); }} onDelete={remove} /></section>
         : <>
           <div className="task-bar"><label htmlFor="task-select">Задание</label>
             <select id="task-select" value={draft.taskId} onChange={(event) => switchTask(event.target.value as TaskId)}>
