@@ -3,6 +3,8 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const output = join(process.cwd(), 'dist');
+const base = process.argv[2] ?? '/';
+assert.ok(base.startsWith('/') && base.endsWith('/'), 'Build base must begin and end with /');
 const manifestPath = join(output, 'manifest.webmanifest');
 const workerPath = join(output, 'sw.js');
 assert.ok(existsSync(manifestPath), 'PWA manifest is missing');
@@ -13,10 +15,15 @@ assert.equal(manifest.name, 'Помощник проверки ЕГЭ по ки�
 assert.equal(manifest.start_url, '.');
 assert.equal(manifest.display, 'standalone');
 
+const html = readFileSync(join(output, 'index.html'), 'utf8');
+assert.ok(html.includes(`href="${base}manifest.webmanifest"`), 'Manifest URL does not match the deployment base');
+const registration = readFileSync(join(output, 'registerSW.js'), 'utf8');
+assert.ok(registration.includes(`${base}sw.js`), 'Service worker URL does not match the deployment base');
+
 for (const size of [192, 512]) {
   const icon = manifest.icons.find((item) => item.sizes === `${size}x${size}` && item.type === 'image/png');
   assert.ok(icon, `Missing ${size}px PNG icon in manifest`);
-  const iconPath = join(output, icon.src.replace(/^\//, ''));
+  const iconPath = join(output, icon.src.startsWith(base) ? icon.src.slice(base.length) : icon.src.replace(/^\//, ''));
   assert.ok(existsSync(iconPath), `Missing icon file: ${icon.src}`);
   assert.deepEqual([...readFileSync(iconPath).subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
 }
