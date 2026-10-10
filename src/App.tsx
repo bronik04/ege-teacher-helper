@@ -16,6 +16,7 @@ import type { WorkingDraft } from './storage/working-draft';
 import { filterRecords } from './storage/filter-records';
 import type { RecordFilters } from './storage/filter-records';
 import './styles.css';
+import OfflineAccess from './components/OfflineAccess';
 
 const AUTOSAVE_ERROR = 'Не удалось автосохранить черновик. Введённые отметки остались на экране.';
 const RESTORE_ERROR = 'Не удалось восстановить автосохранённый черновик. При следующем изменении сервис попробует сохранить текущую проверку.';
@@ -158,11 +159,12 @@ export default function App() {
       <div className="hero"><div><span className="eyebrow">Проверка развёрнутых ответов</span><h1>Каждый балл — по критерию</h1>
         <p>Отмечайте содержание, ошибки и экспертные решения. Итог пересчитается сразу, а справка останется под рукой.</p></div>
         <div className="hero-figure" aria-hidden="true"><span>+</span><span>±</span><span>−</span></div></div>
+      <OfflineAccess />
       <nav className="tabs" aria-label="Разделы"><button type="button" className={view === 'check' ? 'active' : ''} onClick={newCheck}>Новая проверка</button>
         <button type="button" className={view === 'records' ? 'active' : ''} onClick={() => setView('records')}>Сохранённые работы <span className="tab-count" aria-hidden="true">{records.length}</span></button>
         <button type="button" className={view === 'reference' ? 'active' : ''} onClick={openReference}>Справочные материалы</button></nav>
       {error && <div className="alert" role="alert">{error}</div>}
-      {notice && <div className="notice" role="status">{notice}</div>}
+      {notice && <div className="notice" role="status" aria-label="Сообщение о проверке">{notice}</div>}
       {view === 'reference' ? <ReferencePage taskId={referenceTaskId} onTaskChange={setReferenceTaskId} onBack={() => setView('check')} />
       : view === 'report' && reportRecord ? <PrintReport record={reportRecord} onBack={() => setView('records')} />
       : view === 'records' ? <section className="saved-view"><div className="view-heading"><div><span className="eyebrow">Ваши проверки</span><h2>Сохранённые работы</h2></div>

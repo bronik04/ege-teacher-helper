@@ -119,7 +119,7 @@ describe('teacher checking flow', () => {
     expect(screen.getByRole('button', { name: 'Аспект 1: полно' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('textbox', { name: 'Метка ученика' })).toHaveValue('Ученик Б');
     expect(screen.getByRole('textbox', { name: 'Заметка' })).toHaveValue('Проверить иероглифику');
-    expect(screen.getByRole('status')).toHaveTextContent(/Восстановлен автосохранённый черновик/);
+    expect(screen.getByRole('status', { name: 'Сообщение о проверке' })).toHaveTextContent(/Восстановлен автосохранённый черновик/);
   });
 
   it('clears the recovery copy after a check is saved normally', () => {
@@ -194,7 +194,7 @@ describe('teacher checking flow', () => {
   it('removes an old saved notice when new note edits are only autosaved', () => {
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Сохранить проверку' }));
-    expect(screen.getByRole('status')).toHaveTextContent(/Черновик сохранён/);
+    expect(screen.getByRole('status', { name: 'Сообщение о проверке' })).toHaveTextContent(/Черновик сохранён/);
     fireEvent.change(screen.getByRole('textbox', { name: 'Заметка' }), { target: { value: 'Новая заметка' } });
     expect(screen.queryByText(/Черновик сохранён/)).not.toBeInTheDocument();
   });
